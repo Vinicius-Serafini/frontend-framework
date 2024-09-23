@@ -58,7 +58,7 @@ const App = () => {
   return div(
     h1("Counter"),
     p('Count: ', count),
-    p('The counter is greater than five?', isGreaterThanFive)
+    p('The counter is greater than five?', isGreaterThanFive),
     div(
       button({
         onclick: () => count.update((x) => x + 1),
@@ -115,7 +115,7 @@ const App = () => {
     h1("Counter"),
     addReactiveElement(isShowing, (isShowing) => {
       return isShowing ? p('Hello world!') : null
-    })
+    }),
     div(
       button({
         onclick: () => count.update(true),
