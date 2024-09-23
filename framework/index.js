@@ -3,11 +3,6 @@ import * as factories from "./reactive-system/factories.js";
 import { createElement, setElAttributes, setElChildren } from "./template.js";
 import { isPlainObject, isWatchable } from "./utils.js";
 
-const app = {
-  context: new Observable(),
-  deps: new Map(),
-};
-
 
 /** 
  * @template T
