@@ -3,7 +3,7 @@ const { h1, div, p, button } = elements;
 
 const root = document.getElementById('app');
 
-function App() {
+const App = () => {
   const count = observableOf(0);
 
   const counterClass = computed(() => {

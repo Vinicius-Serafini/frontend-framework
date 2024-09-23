@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Document</title>
+
+  <style>
+    :root {
+      --success: #2ecf2e;
+      --white: #fafafa;
+      --white-dark: #f0f0f0;
+      --gray-light: #ccc;
+      --gray: #525252;
+      --gray-dark: #333;
+      --danger: #e74c3c;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      min-height: 100vh;
+      min-width: 100vw;
+      position: relative;
+      background-color: var(--white-dark);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #app {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      gap: 1rem;
+    }
+
+    .container {
+      flex: 1;
+      padding-top: 3rem;
+      min-height: 100;
+      width: clamp(300px, 90vw, 600px);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .title {
+      text-align: center;
+      margin: 0;
+    }
+
+    .todo-search {
+      font-size: 1.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--gray-light);
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .todo-create-fab {
+      position: absolute;
+      bottom: 5%;
+      right: 5%;
+      transform: translateX(50%);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--success);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: none;
+      color: var(--white);
+      font-size: 2.2rem;
+      font-weight: bold;
+    }
+
+    .todo__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      align-items: stretch;
+
+    }
+
+    .todo-list__empty {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--gray-dark);
+      margin: 0;
+    }
+
+    .todo-card {
+      padding: 1.5rem 1rem 1rem 1rem;
+      border-radius: 0.5rem;
+      background-color: var(--white);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .todo-card__title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--gray-dark);
+      margin: 0;
+      margin-bottom: .5rem;
+    }
+
+    .todo-card__description {
+      font-size: 1rem;
+      color: var(--gray);
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .todo-card__delete {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--danger);
+      border: none;
+      background-color: transparent;
+      font-weight: bold;
+    }
+
+    .todo-dialog {
+      border: none;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      background-color: var(--white);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      position: absolute;
+      min-width: 300px;
+    }
+
+    .todo-dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .todo-dialog__close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--danger);
+      border: none;
+      background-color: transparent;
+      font-weight: bold;
+    }
+
+    .todo-dialog__form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .todo-dialog__form-input {
+      font-size: 1.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--gray-light);
+      border-radius: 0.5rem;
+    }
+
+    .todo-dialog__form-label {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--gray-dark);
+    }
+
+    .todo-dialog__form-button {
+      margin: 0;
+      font-size: 1.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--gray-light);
+      border-radius: 0.5rem;
+      background-color: var(--success);
+      color: var(--white);
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script
+    type="module"
+    src="./index.js"
+  ></script>
+</body>
+
+</html>
