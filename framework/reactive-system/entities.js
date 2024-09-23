@@ -1,5 +1,8 @@
+import { isPlainObject } from "../utils.js";
+
 /**
- * @typedef {Observable | Computed } Watchable
+ * @template T
+ * @typedef {ObservableOf<T> | Computed<T> } WatchableValue<T>
  */
 export class Observable {
   /** @type {Set<() => void>} */
@@ -53,7 +56,7 @@ export class ObservableOf extends Observable {
   }
 
   get() {
-    if (typeof this.#value === 'object') {
+    if (typeof this.#value === 'object' && this.#value !== null && isPlainObject(this.#value)) {
       return structuredClone(this.#value);
     }
 
@@ -78,6 +81,10 @@ export class ObservableOf extends Observable {
 
   unsubscribe(fn) {
     super.unsubscribe(fn);
+  }
+
+  notifyAll() {
+    super.notifyAll();
   }
 }
 
@@ -104,12 +111,16 @@ export class Computed {
 
   /** @returns {T} */
   get() {
-    this.update();
     return this.#observable.get();
   }
 
   update() {
-    this.#observable.update(this.#fn());
+    const newData = this.#fn();
+    if (this.#observable.get() === newData) {
+      return;
+    }
+
+    this.#observable.update(newData);
   }
 
   /** @param {() => void} fn */
@@ -119,5 +130,9 @@ export class Computed {
 
   unsubscribe(fn) {
     this.#observable.unsubscribe(fn);
+  }
+
+  notifyAll() {
+    this.#observable.notifyAll();
   }
 }

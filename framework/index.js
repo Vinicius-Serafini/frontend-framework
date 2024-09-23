@@ -1,31 +1,81 @@
-import { Computed, Observable } from "./reactive-system/entities.js";
+import { Computed, Observable, ObservableOf } from "./reactive-system/entities.js";
 import * as factories from "./reactive-system/factories.js";
 import { createElement, setElAttributes, setElChildren } from "./template.js";
 import { isPlainObject, isWatchable } from "./utils.js";
 
 const app = {
   context: new Observable(),
+  deps: new Map(),
 };
 
+
 /** 
- * @param {import("./reactive-system/entities.js").Watchable} watchable
+ * @template T
+ * @param {import("./reactive-system/entities.js").WatchableValue<T> | Observable} observable
  * @param {(value: T) => void} fn 
  */
-const watch = (watchable, fn) => {
-  const unsubscribe = factories.watch(watchable, fn, app.context);
+const watch = (observable, fn) => {
+  const handler = () => {
+    fn(observable.get());
+  }
 
-  return () => {
-    unsubscribe();
+  observable.subscribe(handler);
+
+  const unsubscribe = () => {
+    observable.unsubscribe(handler);
   };
+
+  return unsubscribe;
 }
 
-/** 
+let currentWatchable = new ObservableOf(null);
+
+/**
+ * @template T
  * @param {() => T} fn
  */
 const computed = (fn) => {
-  const computed = factories.computed(fn, app.context);
+  /** @type {Set<import("./reactive-system/entities.js").WatchableValue<T>>} */
+  const deps = new Set();
 
-  return computed;
+  /** @type {() => void | null} */
+  let registerDependencies = () => {
+    currentWatchable.subscribe(() => {
+      if (currentWatchable.get() == null) {
+        return;
+      }
+
+      deps.add(currentWatchable.get());
+    });
+  }
+
+  const computed = factories.computed(() => {
+    if (registerDependencies) {
+      registerDependencies();
+      registerDependencies = null;
+    }
+
+    return fn();
+  });
+
+  deps.forEach((dep) => {
+    dep.subscribe(() => {
+      computed.update();
+    });
+  });
+
+  deps.clear();
+  currentWatchable.unsubscribeAll();
+
+  return new Proxy(computed, {
+    get(target, prop) {
+      if (prop === 'get') {
+        currentWatchable.update(target);
+      }
+
+      return Reflect.get(target, prop);
+    }
+  });
 }
 
 /** 
@@ -33,10 +83,19 @@ const computed = (fn) => {
  * @param {T} value 
  */
 const observableOf = (value) => {
-  const observableOf = factories.observableOf(value, app.context);
+  const observableOf = factories.observableOf(value);
 
-  return observableOf;
+  return new Proxy(observableOf, {
+    get(target, prop) {
+      if (prop === 'get') {
+        currentWatchable.update(target);
+      }
+
+      return Reflect.get(target, prop);
+    }
+  });
 }
+
 
 function normalizeElData(...args) {
   let attrs = {};
@@ -69,7 +128,8 @@ function normalizeElData(...args) {
 
 
 /**
- * @param {Array<HTMLElement | String | import("./reactive-system/entities.js").Watchable>} children
+ * @template T
+ * @param {Array<HTMLElement | String | import("./reactive-system/entities.js").WatchableValue<T>>} children
  * 
  * @returns {Array<HTMLElement | String>}
  */
@@ -107,9 +167,10 @@ function normalizeAttributes(attributes) {
 }
 
 /** 
+ * @template T
  * @type {Record<string, {
- *   (children: Array<HTMLElement | String | import("./reactive-system/entities.js").Watchable>): HTMLElement,
- *   (props: object, children: Array<HTMLElement | String | import("./reactive-system/entities.js").Watchable>): HTMLElement
+ *   (children: Array<HTMLElement | String | import("./reactive-system/entities.js").WatchableValue<T>>): HTMLElement,
+ *   (props: object, children: Array<HTMLElement | String | import("./reactive-system/entities.js").WatchableValue<T>>): HTMLElement
  * }} 
  * 
  */
@@ -161,9 +222,60 @@ const elements = new Proxy({}, {
   }
 });
 
+/** 
+ * @template T
+ * 
+ * @param {HTMLElement} domParent
+ * @param {import("./reactive-system/entities.js").WatchableValue<Array<T>>} array
+ * @param {(data: T) => HTMLElement} elConstructor
+ * 
+ */
+const mapReactiveElement = (domParent, array, elConstructor) => {
+
+  const render = () => {
+    domParent.innerHTML = '';
+    for (const data of array.get()) {
+      const el = elConstructor(data);
+      if (el) {
+        domParent.append(elConstructor(data));
+      }
+    }
+  };
+
+  watch(array, render);
+
+  render();
+
+  return domParent;
+}
+
+/**
+ * @template T
+ * 
+ * @param {import("./reactive-system/entities.js").WatchableValue<T>} observable 
+ * @param {(data: T) => HTMLElement} elConstructor 
+ */
+const addReactiveElement = (observable, elConstructor) => {
+  let dom = elConstructor(observable.get());
+
+  if (!dom) {
+    dom = document.createComment('');
+  }
+
+  watch(observable, () => {
+    const newDom = elConstructor(observable.get());
+    dom.replaceWith(newDom);
+    dom = newDom;
+  });
+
+  return dom;
+}
+
 export {
   watch,
   computed,
   observableOf,
   elements,
+  mapReactiveElement,
+  addReactiveElement
 };

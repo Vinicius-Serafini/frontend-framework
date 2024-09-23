@@ -37,5 +37,11 @@ export const setElAttributes = (domEl, attrs) => {
  */
 export const setElChildren = (domEl, children) => {
   domEl.innerHTML = '';
-  domEl.append(...children);
+  domEl.append(...children.map(child => {
+    if (child !== null && child !== undefined) {
+      return child
+    }
+
+    return document.createComment('');
+  }));
 }
