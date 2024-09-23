@@ -152,7 +152,11 @@ function normalizeAttributes(attributes) {
         return value;
       }).join(' ');
     } else {
-      acc[attr] = value;
+      if (isWatchable(value)) {
+        acc[attr] = value.get();
+      } else {
+        acc[attr] = value;
+      }
     }
 
     return acc;
