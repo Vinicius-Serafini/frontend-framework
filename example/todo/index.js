@@ -79,8 +79,8 @@ const App = () => {
   },
   {
     id: 3,
-    title: 'Todo 2',
-    description: 'Descrição do todo 2'
+    title: 'Todo 3',
+    description: 'Descrição do todo 3'
   }]);
 
   const todoSearch = observableOf('');
