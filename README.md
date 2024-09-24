@@ -152,4 +152,4 @@ const root = document.getElementById('app');
 root.append(App());
 ```
 
-#### More elabored examples inside de `./example` folder
+#### More elaborated examples inside the `./example` folder
