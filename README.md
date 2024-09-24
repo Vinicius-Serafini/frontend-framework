@@ -135,7 +135,7 @@ root.append(App());
 ### Reactive list rendering
 ```js
 import { elements, observableOf, mapReactiveElement } from "../../framework/index.js";
-const { h1, div, p, button } = elements;
+const { h1, ul, li } = elements;
 
 const App = () => {
   const list = observableOf(['1', '2', '3']);
